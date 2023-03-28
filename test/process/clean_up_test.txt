@@ -1,0 +1,43 @@
+import unittest
+from process import clean_up
+from cardlist import action_card
+from cardlist import money_card
+
+class test_flow(unittest.TestCase):
+    def test_flow(self):
+        card_village = action_card.village()
+        card_bronze = money_card.bronze()
+        card_silver = money_card.silver()
+        
+        dummy_hand = [card_village,card_bronze]
+        dummy_playarea = [card_village,card_silver,card_silver,card_silver]
+        dummy_discard = []
+        
+        expected_hand = []
+        expected_playarea = []
+        expected_discard = [card_village,card_bronze,card_village,card_silver,card_silver,card_silver]
+        
+        act_hand, act_play_area, act_discard = clean_up.flow(dummy_playarea,dummy_hand,dummy_discard)
+        self.assertEqual(expected_hand,act_hand)
+        self.assertEqual(expected_playarea,act_play_area)
+        self.assertEqual(expected_discard,act_discard)
+        
+class test_execute(unittest.TestCase):
+    def test_execute(self):
+        card_village = action_card.village()
+        card_bronze = money_card.bronze()
+        card_silver = money_card.silver()
+        
+        dummy_hand = [card_village,card_bronze]
+        dummy_playarea = [card_village,card_silver,card_silver,card_silver]
+        dummy_discard = []
+        dummy_deck = []
+        
+        expected_hand_count = 5
+        
+        _,act_hand,_,_=clean_up.execute(dummy_hand,dummy_playarea,dummy_discard,dummy_deck)
+        self.assertEqual(expected_hand_count,len(act_hand))
+        
+if __name__ == '__main__':
+    unittest.main()
+        

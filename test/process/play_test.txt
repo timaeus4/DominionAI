@@ -1,0 +1,33 @@
+import unittest
+from process import play
+from cardlist import action_card
+from cardlist import money_card
+
+class test_select_card_to_use(unittest.TestCase):
+    def test_select_card_to_use(self):
+        card_village = action_card.village()
+        card_blacksmith = action_card.blacksmith()
+        card_laboratory = action_card.laboratory()
+        dummy_hand = [card_village,card_blacksmith,card_laboratory]
+        
+        expected_card = card_village
+        _,act_card = play.select_card_to_use(dummy_hand)
+        self.assertEqual(act_card,expected_card)
+    
+class test_execute(unittest.TestCase):
+    def test_execute(self):
+        card_festival= action_card.festival()
+        card_mine = action_card.mine()
+        card_money_lender = action_card.money_lender()
+        card_bronze= money_card.bronze()
+        
+        dummy_hand = [card_mine, card_money_lender, card_festival, card_money_lender, card_bronze, card_bronze]
+        
+        expected_playarea = [card_festival,card_mine,card_money_lender]
+        
+        _, _, _, act_playarea, _, _, _, _ = play.execute([],[],dummy_hand,[],[],[])
+        self.assertEqual(act_playarea,expected_playarea)
+
+
+if __name__ == '__main__':
+    unittest.main()
