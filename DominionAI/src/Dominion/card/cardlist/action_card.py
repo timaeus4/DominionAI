@@ -4,6 +4,7 @@ from Dominion.operation import deck_operation
 from Dominion.process import buy
 import copy
 
+#test2
 
 # アクション
 class action_card(card.card):
