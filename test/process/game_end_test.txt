@@ -1,0 +1,134 @@
+import unittest
+from process import game_end
+from cardlist import victory_card
+from cardlist import money_card
+from cardlist import action_card
+import dominion
+
+class test_countpoint(unittest.TestCase):
+    def test_countpoint(self):
+        card_province = victory_card.province()
+        dummy_deck = [card_province,card_province]
+        dummy_hand = [card_province,card_province,card_province]
+        dummy_discard = [card_province,card_province,card_province,card_province]
+        expected_score = 54
+        
+        _,act_score = game_end.count_point(dummy_deck,dummy_hand,dummy_discard)
+        self.assertEqual(act_score,expected_score)
+        
+class test_province_judge_True(unittest.TestCase):
+    def test_province_judge_True(self):
+        card_province = victory_card.province()
+        card_province.num = 0
+        dummy_supply = [card_province]
+        expected_bool = True
+        
+        act_bool = game_end.province_judge(dummy_supply)
+        self.assertEqual(act_bool,expected_bool)
+        
+class test_province_judge_False(unittest.TestCase):
+    def test_province_judge_False(self):
+        card_province = victory_card.province()
+        card_province.num = 1
+        dummy_supply = [card_province]
+        expected_bool = False
+        
+        act_bool = game_end.province_judge(dummy_supply)
+        self.assertEqual(act_bool,expected_bool)
+        
+class test_triple_judge_True(unittest.TestCase):
+    def test_triple_judge_True(self):
+        card_village = action_card.village()
+        card_village.num = 0
+        card_bronze = money_card.bronze()
+        card_bronze.num = 0
+        card_silver = money_card.silver()
+        card_silver.num = 0
+        card_province = victory_card.province()
+        card_province.num = 1
+        dummy_supply = [card_village,card_bronze,card_silver,card_province]
+        expected_bool = True
+        
+        act_bool = game_end.triple_judge(dummy_supply)
+        self.assertEqual(act_bool,expected_bool)
+        
+class test_triple_judge_False(unittest.TestCase):
+    def test_triple_judge_False(self):
+        card_village = action_card.village()
+        card_village.num = 0
+        card_bronze = money_card.bronze()
+        card_bronze.num = 3
+        card_silver = money_card.silver()
+        card_silver.num = 2
+        card_province = victory_card.province()
+        card_province.num = 1
+        dummy_supply = [card_village,card_bronze,card_silver,card_province]
+        expected_bool = False
+        
+        act_bool = game_end.triple_judge(dummy_supply)
+        self.assertEqual(act_bool,expected_bool)
+        
+class test_is_win(unittest.TestCase):
+    def test_is_win(self):
+        card_province = victory_card.province()
+        target = dominion.Player()
+        target.deck.append(card_province)
+        
+        other1 =  dominion.Player()
+        other2 =  dominion.Player()
+        other3 =  dominion.Player()
+        other_players = [other1,other2,other3]
+        
+        expected_bool = True
+        
+        act_bool = game_end.is_win(target,other_players)
+        self.assertEqual(act_bool,expected_bool)
+
+class test_is_Lose(unittest.TestCase):
+    def test_is_Lose(self):
+        card_province = victory_card.province()
+        target = dominion.Player()
+        
+        other1 =  dominion.Player()
+        other1.deck.append(card_province)
+        other2 =  dominion.Player()
+        other3 =  dominion.Player()
+        other_players = [other1,other2,other3]
+        
+        expected_bool = False
+        
+        act_bool = game_end.is_win(target,other_players)
+        self.assertEqual(act_bool,expected_bool)
+        
+class test_is_draw1(unittest.TestCase):
+    def test_is_draw1(self):
+        card_province = victory_card.province()
+        target = dominion.Player()
+        other1 =  dominion.Player()
+        other2 =  dominion.Player()
+        other3 =  dominion.Player()
+        other_players = [other1,other2,other3]
+        
+        expected_bool = True
+        
+        act_bool = game_end.is_win(target,other_players)
+        self.assertEqual(act_bool,expected_bool)
+        
+class test_is_draw2(unittest.TestCase):
+    def test_is_draw2(self):
+        card_province = victory_card.province()
+        target = dominion.Player()
+        target.turn = 1
+        other1 =  dominion.Player()
+        other2 =  dominion.Player()
+        other3 =  dominion.Player()
+        other_players = [other1,other2,other3]
+        
+        expected_bool = False
+        
+        act_bool = game_end.is_win(target,other_players)
+        self.assertEqual(act_bool,expected_bool)
+    
+    
+if __name__ == '__main__':
+    unittest.main()

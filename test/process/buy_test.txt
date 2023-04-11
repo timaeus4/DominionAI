@@ -1,0 +1,138 @@
+import unittest
+from algorithm import find_algorithm
+from process import buy
+from cardlist import action_card
+from cardlist import money_card
+
+class test_buy1(unittest.TestCase):
+    def test_buy1(self):
+        card_village = action_card.village()
+        expected_money = 4
+        expected_discard = [card_village]
+    
+        act_money,act_discard = buy.buy([card_village],7,card_village,[])
+        self.assertEqual(expected_money,act_money)
+        self.assertEqual(expected_discard,act_discard)
+        
+class test_buy2(unittest.TestCase):
+    def test_buy2(self):
+        card_village = action_card.village()
+        expected_money = 7
+        expected_discard = []
+    
+        act_money,act_discard = buy.buy([],7,card_village,[])
+        self.assertEqual(expected_money,act_money)
+        self.assertEqual(expected_discard,act_discard)
+        
+class test_buy3(unittest.TestCase):
+    def test_buy3(self):
+        card_village = action_card.village()
+        card_village.num = 0
+        expected_money = 7
+        expected_discard = []
+    
+        act_money,act_discard = buy.buy([card_village],7,card_village,[])
+        self.assertEqual(expected_money,act_money)
+        self.assertEqual(expected_discard,act_discard)
+        
+class test_countmoney(unittest.TestCase):
+    def test_countmoney(self):
+        card_village = action_card.village()
+        card_bronze = money_card.bronze()
+        card_silver = money_card.silver()
+        card_gold = money_card.gold()
+        dummy_hand = [card_bronze,card_silver,card_gold,card_village]
+        expected_money = 6
+        
+        act_money = buy.count_money(dummy_hand)
+        self.assertEqual(expected_money,act_money)
+        
+class test_executeAI1(unittest.TestCase):
+    def test_executeAI1(self):
+        card_village = action_card.village()
+        card_bronze = money_card.bronze()
+        card_silver = money_card.silver()
+        card_gold = money_card.gold()
+        dummy_supply = [card_village,card_bronze,card_silver,card_gold]
+        dummy_hand=[card_bronze,card_silver]
+        dummy_discard = []
+        dummy_money_stack = 0
+        dummy_buy_stack = 1
+        dummy_buy_history = []
+        dummy_deck = []
+        dummy_purchase = card_village 
+        
+        
+        expected_discard = [card_village]
+        expected_buy_history = [[3,card_village.name]]
+        act_discard, act_buy_history = buy.execute_AI(dummy_supply,dummy_hand,dummy_discard,dummy_money_stack,dummy_buy_stack,dummy_buy_history,dummy_deck,dummy_purchase)
+        self.assertEqual(expected_discard,act_discard)
+        self.assertEqual(expected_buy_history,act_buy_history)
+    
+    
+class test_executeAI2(unittest.TestCase):
+    def test_executeAI2(self):
+        card_village = action_card.village()
+        card_bronze = money_card.bronze()
+        card_silver = money_card.silver()
+        card_gold = money_card.gold()
+        dummy_supply = [card_bronze,card_silver,card_gold]
+        dummy_hand=[card_bronze,card_silver]
+        dummy_discard = []
+        dummy_money_stack = 0
+        dummy_buy_stack = 1
+        dummy_buy_history = []
+        dummy_deck = []
+        dummy_purchase = card_village
+        
+        expected_discard = []
+        expected_buy_history = [[3,"nothing"]]
+        act_discard, act_buy_history = buy.execute_AI(dummy_supply,dummy_hand,dummy_discard,dummy_money_stack,dummy_buy_stack,dummy_buy_history,dummy_deck,dummy_purchase)
+        self.assertEqual(expected_discard,act_discard)
+        self.assertEqual(expected_buy_history,act_buy_history)
+        
+class test_executeAI3(unittest.TestCase):
+    def test_executeAI3(self):
+        card_village = action_card.village()
+        card_bronze = money_card.bronze()
+        card_silver = money_card.silver()
+        card_gold = money_card.gold()
+        dummy_supply = [card_bronze,card_silver,card_gold]
+        dummy_hand=[card_bronze,card_silver]
+        dummy_discard = []
+        dummy_money_stack = 0
+        dummy_buy_stack = 1
+        dummy_buy_history = []
+        dummy_deck = []
+        dummy_purchase = None
+        
+        expected_discard = []
+        expected_buy_history = [[3,"nothing"]]
+        act_discard, act_buy_history = buy.execute_AI(dummy_supply,dummy_hand,dummy_discard,dummy_money_stack,dummy_buy_stack,dummy_buy_history,dummy_deck,dummy_purchase)
+        self.assertEqual(expected_discard,act_discard)
+        self.assertEqual(expected_buy_history,act_buy_history)
+        
+class test_executeAI4(unittest.TestCase):
+    def test_executeAI4(self):
+        card_village = action_card.village()
+        card_village.Num = 0
+        card_bronze = money_card.bronze()
+        card_silver = money_card.silver()
+        card_gold = money_card.gold()
+        dummy_supply = [card_bronze,card_silver,card_gold]
+        dummy_hand=[card_bronze,card_silver]
+        dummy_discard = []
+        dummy_money_stack = 0
+        dummy_buy_stack = 1
+        dummy_buy_history = []
+        dummy_deck = []
+        dummy_purchase = card_village
+        
+        expected_discard = []
+        expected_buy_history = [[3,"nothing"]]
+        act_discard, act_buy_history = buy.execute_AI(dummy_supply,dummy_hand,dummy_discard,dummy_money_stack,dummy_buy_stack,dummy_buy_history,dummy_deck,dummy_purchase)
+        self.assertEqual(expected_discard,act_discard)
+        self.assertEqual(expected_buy_history,act_buy_history)
+        
+if __name__ == '__main__':
+    unittest.main()

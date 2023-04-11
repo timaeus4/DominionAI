@@ -1,0 +1,28 @@
+import unittest
+from process import game_start
+from operation import deck_operation
+from cardlist import action_card
+from cardlist import money_card
+from cardlist import victory_card
+
+
+class test_game_start(unittest.TestCase):
+    def test_set_common_supply(self):    
+        supply = []
+        
+        actual = game_start.set_common_supply(supply)
+        self.assertEqual("province", actual.pop().name)
+        self.assertEqual("territory", actual.pop().name)
+        self.assertEqual("house", actual.pop().name)
+        self.assertEqual("gold", actual.pop().name)
+        self.assertEqual("silver", actual.pop().name)
+        self.assertEqual("bronze", actual.pop().name)
+        
+    def test_set_personal_info(self):
+        deck, hand, discard = game_start.set_personal_info()
+        self.assertEqual(5, len(deck))
+        self.assertEqual(5, len(hand))
+        self.assertEqual(0, len(discard))
+    
+if __name__ == '__main__':
+    unittest.main()
