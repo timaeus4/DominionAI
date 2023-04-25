@@ -473,7 +473,14 @@ class vassal(action_card):
         super(vassal, self).__init__("vassal", 3, 3, False, False)
     
     def effect(self, supply, t, players, trash, action_stack):
-        
+        t.money_stack += 2
+        card = deck_operation.check_top(t.deck, t.hand, t.discard)
+        if(card.cardtype != "action"):
+            t.discard.append(t.deck.pop(0))
+        else:
+            t.play_area.append(t.deck.pop(0))
+            card.effect(supply, t, players, trash, action_stack)
+
         return supply, t, players, trash, action_stack
 
 # 商人
