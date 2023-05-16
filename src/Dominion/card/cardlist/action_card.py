@@ -508,7 +508,41 @@ class poacher(action_card):
         super(poacher, self).__init__("poacher", 4, 3, False, False)
     
     def effect(self, supply, t, players, trash, action_stack):
-        
+        t.deck, t.hand, t.discard = deck_operation.draw(t.deck, t.hand, t.discard)
+        action_stack += 1
+        t.money_stack += 1
+
+        count = 0
+        for card in supply:
+          if(card.num == 0):
+            count += 1
+
+        while count > 0:
+            for i in range(len(t.hand)):
+                if (t.hand[i].name=="cursed") or (t.hand[i].name=="house") or (t.hand[i].name=="territory") or (t.hand[i].name=="province"):
+                    card = t.hand.pop(i)
+                    t.discard.append(card)
+                    count -= 1
+                    break
+            else:
+                break
+            
+        while count > 0:
+            for i in range(len(t.hand)):
+                if (t.hand[i].name=="bronze"):
+                    card = t.hand.pop(i)
+                    t.discard.append(card)
+                    count -= 1
+                    break
+            else:
+                break
+            
+        while count > 0:
+            for i in range(len(t.hand)):
+                card = t.hand.pop(i)
+                t.discard.append(card)
+                break
+                
         return supply, t, players, trash, action_stack
 
 # 衛兵
