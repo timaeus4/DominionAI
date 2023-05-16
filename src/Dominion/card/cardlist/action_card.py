@@ -535,5 +535,26 @@ class artisan(action_card):
         super(artisan, self).__init__("artisan", 6, 0, False, False)
     
     def effect(self, supply, t, players, trash, action_stack):
+        purchase = strategy.coin_method(5)
+        for card in supply:
+          if(card.name == purchase.name):
+            if(card.num > 0):
+                card.reduce(1)
+                t.hand.append(purchase)
+
+        if action_stack <= 1:
+          for i in range(len(t.hand)):
+            if t.hand[i].cardtype == "action":
+              temp = t.hand.pop(i)
+              t.deck.insert(0,temp)
+              return supply, t, players, trash, action_stack
         
+        for i in range(len(t.hand)):
+         if t.hand[i].cardtype == "victory":
+            temp = t.hand.pop(i)
+            t.deck.insert(0,temp)
+            return supply, t, players, trash, action_stack
+        
+        temp = t.hand.pop(0)
+        t.deck.insert(0,temp)
         return supply, t, players, trash, action_stack
