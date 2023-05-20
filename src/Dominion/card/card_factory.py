@@ -145,19 +145,31 @@ def make_card_standard(num):
         return action_card.artisan()
     else:
         raise Exception("Invalid number")
-
-def make_cardlist_for_version(ver_name):
+    
+def make_cardlist_common():
     cardlist = []
-
     common_max = 7
     for i in range(common_max):
         cardlist.append(make_card_common(i))
+    return cardlist
+
+def make_cardlist_for_version(ver_name, common_flg):
+    cardlist = []
+
+    if common_flg:
+        common_max = 7
+        for i in range(common_max):
+            cardlist.append(make_card_common(i))
 
     if(ver_name=="standard"):
-        version_max = 26
-        for i in range(version_max):
+        standard_max = 26
+        for i in range(standard_max):
             cardlist.append(make_card_standard(i))
     else:
         raise Exception("Invalid name")
 
-    return cardlist, version_max
+    return cardlist
+
+def get_version_max(ver_name):
+    if(ver_name=="standard"):
+        return 26

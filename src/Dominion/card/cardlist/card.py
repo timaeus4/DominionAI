@@ -1,6 +1,7 @@
 class card():
-    def __init__(self, name, cardtype, cost, money_point, victory_point, num):
+    def __init__(self, name, japanese, cardtype, cost, money_point, victory_point, num):
         self.name = name
+        self.japanese = japanese
         self.cardtype = cardtype
         self.cost = cost
         self.money_point = money_point

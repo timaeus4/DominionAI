@@ -138,7 +138,6 @@ def optimize_model():
     for i in numlist:
         tmplist.append(result[0, i+1])
     next_state_values[non_final_mask] = max(tmplist).detach()
-    # next_state_values[non_final_mask] = target_net(non_final_next_states).max(1)[0].detach()
 
     expected_state_action_values = (next_state_values * GAMMA) + reward_batch
     

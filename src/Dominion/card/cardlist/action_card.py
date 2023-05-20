@@ -7,8 +7,8 @@ import copy
 
 # アクション
 class action_card(card.card):
-    def __init__(self, name, cost, priority, attack, reaction):
-        super(action_card, self).__init__(name, "action", cost, 0, 0, 10)
+    def __init__(self, name, japanese, cost, priority, attack, reaction):
+        super(action_card, self).__init__(name, japanese, "action", cost, 0, 0, 10)
         self.priority = priority
         self.attack = attack
         self.reaction = reaction
@@ -19,7 +19,7 @@ class action_card(card.card):
 # 村
 class village(action_card):
     def __init__(self):
-        super(village, self).__init__("village", 3, 3, False, False)
+        super(village, self).__init__("village", "村", 3, 3, False, False)
     
     def effect(self, supply, t, players, trash, action_stack):
         t.deck, t.hand, t.discard = deck_operation.draw(t.deck, t.hand, t.discard)
@@ -31,7 +31,7 @@ class village(action_card):
 # 鍛冶屋
 class blacksmith(action_card):
     def __init__(self):
-        super(blacksmith, self).__init__("blacksmith", 4, 1, False, False)
+        super(blacksmith, self).__init__("blacksmith", "鍛冶屋", 4, 1, False, False)
         
     def effect(self, supply, t, players, trash, action_stack):
         for i in range(3):
@@ -42,7 +42,7 @@ class blacksmith(action_card):
 # 研究所
 class laboratory(action_card):
     def __init__(self):
-        super(laboratory, self).__init__("laboratory", 5, 3, False, False)
+        super(laboratory, self).__init__("laboratory", "研究所", 5, 3, False, False)
         
     def effect(self, supply, t, players, trash, action_stack):
         for i in range(2):
@@ -54,7 +54,7 @@ class laboratory(action_card):
 # 地下貯蔵庫
 class cellar(action_card):
     def __init__(self):
-        super(cellar, self).__init__("cellar", 2, 3, False, False)
+        super(cellar, self).__init__("cellar", "地下貯蔵庫", 2, 3, False, False)
         
     def effect(self, supply, t, players, trash, action_stack):
         count = 0
@@ -104,7 +104,7 @@ class cellar(action_card):
 # 礼拝堂
 class chapel(action_card):
     def __init__(self):
-        super(chapel, self).__init__("chapel", 2, 0, False, False)
+        super(chapel, self).__init__("chapel", "礼拝堂", 2, 0, False, False)
         
     def effect(self, supply, t, players, trash, action_stack):
         count = 0
@@ -143,7 +143,7 @@ class chapel(action_card):
 # 堀
 class moat(action_card):
     def __init__(self):
-        super(moat, self).__init__("moat", 2, 1, False, True)
+        super(moat, self).__init__("moat", "堀", 2, 1, False, True)
 
     def effect(self, supply, t, players, trash, action_stack):
         for i in range(2):
@@ -154,7 +154,7 @@ class moat(action_card):
 # 工房
 class workshop(action_card):
     def __init__(self):
-        super(workshop, self).__init__("workshop", 3, 0, False, False)
+        super(workshop, self).__init__("workshop", "工房", 3, 0, False, False)
         
     def effect(self, supply, t, players, trash, action_stack):
         card = strategy.coin_method(4)
@@ -165,7 +165,7 @@ class workshop(action_card):
 # 改築
 class remodel(action_card):
     def __init__(self):
-        super(remodel, self).__init__("remodel", 4, 0, False, False)
+        super(remodel, self).__init__("remodel", "改築", 4, 0, False, False)
         
     def effect(self, supply, t, players, trash, action_stack):
         
@@ -199,7 +199,7 @@ class remodel(action_card):
 # 金貸し
 class money_lender(action_card):
     def __init__(self):
-        super(money_lender, self).__init__("money_lender", 4, 0, False, False)
+        super(money_lender, self).__init__("money_lender", "金貸し", 4, 0, False, False)
         
     def effect(self, supply, t, players, trash, action_stack):
         for i in range(len(t.hand)):
@@ -214,7 +214,7 @@ class money_lender(action_card):
 # 玉座の間
 class throne_room(action_card):
     def __init__(self):
-        super(throne_room, self).__init__("throne_room", 4, 3, False, False)
+        super(throne_room, self).__init__("throne_room", "玉座の間", 4, 3, False, False)
         
     def effect(self, supply, t, players, trash, action_stack):
         priority = 3
@@ -237,7 +237,7 @@ class throne_room(action_card):
 # 民兵
 class militia(action_card):
     def __init__(self):
-        super(militia, self).__init__("militia", 4, 0, True, False)
+        super(militia, self).__init__("militia", "民兵", 4, 0, True, False)
         
     def effect(self, supply, t, players, trash, action_stack):
         t.money_stack += 2
@@ -286,7 +286,7 @@ class militia(action_card):
 # 役人
 class bureaucrat(action_card):
     def __init__(self):
-        super(bureaucrat, self).__init__("bureaucrat", 4, 0, True, False)
+        super(bureaucrat, self).__init__("bureaucrat", "役人", 4, 0, True, False)
         
     def effect(self, supply, t, players, trash, action_stack):
         for card in supply:
@@ -319,7 +319,7 @@ class bureaucrat(action_card):
 # 市場
 class market(action_card):
     def __init__(self):
-        super(market, self).__init__("market", 5, 3, False, False)
+        super(market, self).__init__("market", "市場", 5, 3, False, False)
         
     def effect(self, supply, t, players, trash, action_stack):
         for i in range(1):
@@ -333,7 +333,7 @@ class market(action_card):
 # 議事堂
 class council_room(action_card):
     def __init__(self):
-        super(council_room, self).__init__("council_room", 5, 1, False, False)
+        super(council_room, self).__init__("council_room", "議事堂", 5, 1, False, False)
     
     def effect(self, supply, t, players, trash, action_stack):
         for i in range(4):
@@ -357,7 +357,7 @@ class council_room(action_card):
 # 鉱山（銅銀のみ対応）
 class mine(action_card):
     def __init__(self):
-        super(mine, self).__init__("mine", 5, 0, False, False)
+        super(mine, self).__init__("mine", "鉱山", 5, 0, False, False)
         
     def effect(self, supply, t, players, trash, action_stack):
         for i in range(len(t.hand)):
@@ -397,7 +397,7 @@ class mine(action_card):
 # 祝祭
 class festival(action_card):
     def __init__(self):
-        super(festival, self).__init__("festival", 5, 2, False, False)
+        super(festival, self).__init__("festival", "祝祭", 5, 2, False, False)
         
     def effect(self, supply, t, players, trash, action_stack):
         action_stack += 2
@@ -409,7 +409,7 @@ class festival(action_card):
 # 書庫
 class archive(action_card):
     def __init__(self):
-        super(archive, self).__init__("archive", 5, 1, False, False)
+        super(archive, self).__init__("archive", "書庫", 5, 1, False, False)
         
     def effect(self, supply, t, players, trash, action_stack):
         action_count = action_stack
@@ -438,7 +438,7 @@ class archive(action_card):
 # 魔女
 class witch(action_card):
     def __init__(self):
-        super(witch, self).__init__("witch", 5, 1, True, False)
+        super(witch, self).__init__("witch", "魔女", 5, 1, True, False)
         
     def effect(self, supply, t, players, trash, action_stack):
         for i in range(2):
@@ -470,16 +470,23 @@ class witch(action_card):
 # 家臣
 class vassal(action_card):
     def __init__(self):
-        super(vassal, self).__init__("vassal", 3, 3, False, False)
+        super(vassal, self).__init__("vassal", "家臣", 3, 3, False, False)
     
     def effect(self, supply, t, players, trash, action_stack):
-        
+        t.money_stack += 2
+        card = deck_operation.check_top(t.deck, t.hand, t.discard)
+        if(card.cardtype != "action"):
+            t.discard.append(t.deck.pop(0))
+        else:
+            t.play_area.append(t.deck.pop(0))
+            card.effect(supply, t, players, trash, action_stack)
+
         return supply, t, players, trash, action_stack
 
 # 商人
 class merchant(action_card):
     def __init__(self):
-        super(merchant, self).__init__("merchant", 3, 3, False, False)
+        super(merchant, self).__init__("merchant", "商人", 3, 3, False, False)
     
     def effect(self, supply, t, players, trash, action_stack):
         
@@ -489,7 +496,7 @@ class merchant(action_card):
 # 前駆者
 class herbinger(action_card):
     def __init__(self):
-        super(herbinger, self).__init__("herbinger", 3, 3, False, False)
+        super(herbinger, self).__init__("herbinger", "前駆者", 3, 3, False, False)
     
     def effect(self, supply, t, players, trash, action_stack):
         
@@ -498,16 +505,50 @@ class herbinger(action_card):
 # 密猟者
 class poacher(action_card):
     def __init__(self):
-        super(poacher, self).__init__("poacher", 4, 3, False, False)
+        super(poacher, self).__init__("poacher", "密猟者", 4, 3, False, False)
     
     def effect(self, supply, t, players, trash, action_stack):
-        
+        t.deck, t.hand, t.discard = deck_operation.draw(t.deck, t.hand, t.discard)
+        action_stack += 1
+        t.money_stack += 1
+
+        count = 0
+        for card in supply:
+          if(card.num == 0):
+            count += 1
+
+        while count > 0:
+            for i in range(len(t.hand)):
+                if (t.hand[i].name=="cursed") or (t.hand[i].name=="house") or (t.hand[i].name=="territory") or (t.hand[i].name=="province"):
+                    card = t.hand.pop(i)
+                    t.discard.append(card)
+                    count -= 1
+                    break
+            else:
+                break
+            
+        while count > 0:
+            for i in range(len(t.hand)):
+                if (t.hand[i].name=="bronze"):
+                    card = t.hand.pop(i)
+                    t.discard.append(card)
+                    count -= 1
+                    break
+            else:
+                break
+            
+        while count > 0:
+            for i in range(len(t.hand)):
+                card = t.hand.pop(i)
+                t.discard.append(card)
+                break
+                
         return supply, t, players, trash, action_stack
 
 # 衛兵
 class stentry(action_card):
     def __init__(self):
-        super(stentry, self).__init__("stentry", 5, 3, False, False)
+        super(stentry, self).__init__("stentry", "衛兵", 5, 3, False, False)
     
     def effect(self, supply, t, players, trash, action_stack):
         
@@ -516,7 +557,7 @@ class stentry(action_card):
 # 山賊
 class bandit(action_card):
     def __init__(self):
-        super(bandit, self).__init__("bandit", 5, 0, True, False)
+        super(bandit, self).__init__("bandit", "山賊",5, 0, True, False)
     
     def effect(self, supply, t, players, trash, action_stack):
         
@@ -525,8 +566,29 @@ class bandit(action_card):
 # 職人
 class artisan(action_card):
     def __init__(self):
-        super(artisan, self).__init__("artisan", 6, 0, False, False)
+        super(artisan, self).__init__("artisan", "職人", 6, 0, False, False)
     
     def effect(self, supply, t, players, trash, action_stack):
+        purchase = strategy.coin_method(5)
+        for card in supply:
+          if(card.name == purchase.name):
+            if(card.num > 0):
+                card.reduce(1)
+                t.hand.append(purchase)
+
+        if action_stack <= 1:
+          for i in range(len(t.hand)):
+            if t.hand[i].cardtype == "action":
+              temp = t.hand.pop(i)
+              t.deck.insert(0,temp)
+              return supply, t, players, trash, action_stack
         
+        for i in range(len(t.hand)):
+         if t.hand[i].cardtype == "victory":
+            temp = t.hand.pop(i)
+            t.deck.insert(0,temp)
+            return supply, t, players, trash, action_stack
+        
+        temp = t.hand.pop(0)
+        t.deck.insert(0,temp)
         return supply, t, players, trash, action_stack

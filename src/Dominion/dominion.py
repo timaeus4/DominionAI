@@ -6,7 +6,8 @@ class Dominion():
     
     def __init__(self, ver_name):
         # バージョン毎の全カードリスト、全カード数
-        self.all_cardlist, self.version_card_num = CF.make_cardlist_for_version(ver_name)
+        self.all_cardlist = CF.make_cardlist_for_version(ver_name, True)
+        self.version_card_num = CF.get_version_max(ver_name)
         self.all_cardlist = game_start.sort_by_cost(self.all_cardlist)
     
     # 初期設定
