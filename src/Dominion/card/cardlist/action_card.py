@@ -591,4 +591,5 @@ class artisan(action_card):
         
         temp = t.hand.pop(0)
         t.deck.insert(0,temp)
+
         return supply, t, players, trash, action_stack
