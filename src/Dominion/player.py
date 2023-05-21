@@ -14,6 +14,7 @@ class Player():
         self.turn = 0
         self.buy_history = []
         self.order = n
+        self.barrier_flg = False
         
         self.deck, self.hand, self.discard = game_start.setup_personal_info()
     

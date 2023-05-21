@@ -19,6 +19,7 @@ class Dominion_forTrain(dominion.Dominion):
         return target, players
     
     def execute_buy(self, player, purchase):
+        self.supply, player, self.trash = play.buy_effect(self.supply, player, self.trash)
         money = player.count_money()
         player = buy.execute(self.supply, player, money, purchase)
         return player

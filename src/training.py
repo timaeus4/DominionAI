@@ -28,7 +28,7 @@ MAX_PRICE = 8  # プール内最大価格
 VERSION = "standard"  # サプライのバージョン
 COMMON_CARD_NUM = 7  # 共通サプライ種類数
 MAX_STATE = 20  # 同一カード保持上限枚数
-ADJUST = 192  # SUPPLY_NUM, MAX_STATEに依存
+ADJUST = 96  # SUPPLY_NUM, MAX_STATEに依存
 MAX_TURN = 30  # ターン上限
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 TRANSITION = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
@@ -162,7 +162,7 @@ def save_log(fileName, word):
 total_reward = 0
 for i_episode in range(1, NUM_EPISODES+1):
 
-    dominion.setup(dominion.generate_random_supply())
+    dominion.setup(dominion.generate_random_supply(VERSION, version_card_num))
     players = []
     
     # 順番決め

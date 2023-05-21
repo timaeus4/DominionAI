@@ -1,31 +1,15 @@
 # DominionAI動作テスト用
 
-import math
-import random
-import datetime
 import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
 import tkinter as tk
 from tkinter import messagebox, ttk
-if 'inline' in matplotlib.get_backend():
-    from IPython import display
-from collections import namedtuple, deque
-from itertools import count
-from PIL import Image
+from collections import namedtuple
 
 import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
-import torchvision.transforms as T
 
 from Dominion import dominion as d
-from Dominion import player as p
-from Dominion import strategy
 from Dominion.card import card_factory as CF
 from DQN import DQN
-from DQN import DQN_Memory as DQN_M
 from Utils import myFunction as myF
 
 MAX_PRICE = 8

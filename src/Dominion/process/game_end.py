@@ -1,3 +1,5 @@
+from Dominion.process import play
+
 def count_point(deck, hand, discard):
     cardlist = []
     score = 0
@@ -13,21 +15,10 @@ def count_point(deck, hand, discard):
     for card in discard:
         cardlist.append(card)
         score += card.victory_point
-
-    score += count_gardens_point(cardlist)
+    
+    score += play.victory_effect(cardlist)
     
     return cardlist, score
-
-# 庭園の得点計算
-def count_gardens_point(cardlist):
-    gardens_num = 0
-    for card in cardlist:
-        if card.name=="gardens":
-            gardens_num += 1
-    
-    gardens_point = len(cardlist) // 10
-    return gardens_num * gardens_point
-
     
 def province_judge(supply):
     for card in supply:
@@ -49,17 +40,6 @@ def triple_judge(supply):
         
 def gameset_judge(supply):
     return province_judge(supply) or triple_judge(supply)
-
-# not use    
-def execute(agents):
-    max_score = -100
-    for agent in agents:
-        cardlist, score = count_point(agent.deck, agent.hand, agent.discard)
-        if (score > max_score):
-            max_score = score
-            win_cardlist = cardlist
-            winner = agent
-    return winner, cardlist, score
     
 def is_win(target, players):
     _, score = count_point(target.deck, target.hand, target.discard)
