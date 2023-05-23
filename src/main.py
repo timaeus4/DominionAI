@@ -2,11 +2,9 @@
 
 import numpy as np
 import tkinter as tk
+import torch
 from tkinter import messagebox, ttk
 from collections import namedtuple
-
-import torch
-
 from Dominion import dominion as d
 from Dominion.card import card_factory as CF
 from DQN import DQN
@@ -51,12 +49,14 @@ def shape_state(state, size, money, device):
     c[1,:,:] = b
     return myF.convert_to_tensor(c, device)
 
+# セットアップウィンドウ
 def setup_root(root):
     # ラベルを作成する
     message_label = tk.Label(root, text="サプライを選択してください")
     message_label.place(x=0, y=0)
 
     #チェックボックスの設置
+    # バージョン内の全カードを表示
     list_check = []
     count=[0,0,0,0,0,0,0,0,0]
     for i in range(len(cardlist)):
@@ -68,6 +68,7 @@ def setup_root(root):
         c.place(x=100*(cost-2), y=50+(30*(count[cost])))
         count[cost]+=1
 
+    # 決定ボタンを押したときの挙動
     def decidion():
         # プルダウンメニューに表示する項目を作成する
         random_supply = []
@@ -101,8 +102,9 @@ def setup_root(root):
     button = tk.Button(root, text='決定', command=decidion)
     button.place(x=200, y=350)
 
-
+# メインウィンドウ
 def setup_main(main_window, supply):
+    # 購入カード探索ボタンを押したときの挙動
     def search():
         money = int(money_var.get())
         state = shape_state(dominion.get_state(allcard), MAX_STATE, money, DEVICE)
@@ -111,7 +113,7 @@ def setup_main(main_window, supply):
             money_label["text"]="Best Practice: None"
         else:
             money_label["text"]="Best Practice: "+action.japanese
-
+    # 獲得ボタンを押したときの挙動
     def get():
         cardname = card_var.get()
         for card in supply:
@@ -119,6 +121,7 @@ def setup_main(main_window, supply):
                 allcard.append(card)
         card_label["text"]="Append: "+cardname
 
+    # 表示名のリスト
     supply_namelist = []
     for card in supply:
         supply_namelist.append(card.japanese)

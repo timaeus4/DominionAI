@@ -36,10 +36,7 @@ class Dominion():
         
     # Tensor型 -> card型への変換
     def int2allcard(self, i):
-        if (i==0):
-            return None
-        else:
-            return self.all_cardlist[i-1]
+        return self.all_cardlist[i]
     
     # card型 -> Tensor型への変換
     def allcard2int(self, c):

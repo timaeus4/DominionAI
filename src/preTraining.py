@@ -1,14 +1,9 @@
 # DominionAI学習用クラス
 
 import os
-import math
 import random
 import datetime
 import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-if 'inline' in matplotlib.get_backend():
-    from IPython import display
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
@@ -23,7 +18,7 @@ from Utils import myFunction as myF
 
 
 # 固定パラメータ
-MEMORY_SIZE = 10000  # 記録用メモリサイズ
+MEMORY_SIZE = 50000  # 記録用メモリサイズ
 MAX_PRICE = 8  # プール内最大価格
 VERSION = "standard"  # サプライのバージョン
 COMMON_CARD_NUM = 7  # 共通サプライ種類数
@@ -35,12 +30,12 @@ TRANSITION = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'
 
 
 # ハイパーパラメータ
-NUM_EPISODES = 2000  # 学習回数
-BATCH_SIZE = 150  # バッチサイズ
+NUM_EPISODES = 5000  # 学習回数
+BATCH_SIZE = 80  # バッチサイズ
 GAMMA = 0.99  # 割引率
-EPS_START = 0.25  # e-greedy法
-EPS_END = 0.05  # e-greedy法
-EPS_DECAY = 2000  # e-greedy法
+EPS_START = 0.8  # e-greedy法
+EPS_END = 0.1  # e-greedy法
+EPS_DECAY = 10000  # e-greedy法
 TARGET_UPDATE = 10  # 学習結果反映タイミング 
 TARGET_SAVE = 100  # 学習結果記録タイミング
 
@@ -49,9 +44,10 @@ TARGET_SAVE = 100  # 学習結果記録タイミング
 now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9), 'JST'))
 ymd = format(now,"%m%d")
 hm = format(now,"%H%M")
-dirname = ymd+"/"+hm
+dirname = ymd+"/"+hm+"pre"
 log1 = dirname+'/buy.log'
 log2 = dirname+'/train.log'
+log3 = dirname+'/param.csv'
 os.makedirs(dirname)
 
 
@@ -81,15 +77,17 @@ def select_action(state, money):
         with torch.no_grad():
             result = policy_net(state)
 
+
             # money, supplyで絞り込み
             numlist = dominion.get_numlist_for_just_money(money)
             tmplist = []
-            tmplist.append(result[0, 0])  # Noneは毎回選択肢に入る
+            if money <= 2:
+                tmplist.append(float(result[0, 0]))  # 2金以下の場合Noneを選択肢に入れる
             for i in numlist:
-                tmplist.append(result[0, i+1])
+                tmplist.append(float(result[0, i+1]))
 
             # 絞り込み後のリストから最大値を探索
-            if tmplist.index(max(tmplist)) == 0:
+            if money <= 2 & tmplist.index(max(tmplist)) == 0:
                 return None
             else:
                 return dominion.int2allcard(numlist[tmplist.index(max(tmplist))-1])
@@ -152,10 +150,14 @@ def optimize_model():
 
 # ログ出力        
 def save_log(fileName, word):
-    with open(fileName, 'a') as f:
+    with open(fileName, 'a', encoding='utf-8') as f:
         f.write(word)
 
-
+# 記録用
+save_log(log3, 'None, ')
+for log3_card in all_list:
+    save_log(log3, log3_card.japanese + ', ')
+save_log(log3, '\n')
 # 勝率計算用
 total_reward = 0
 for i_episode in range(1, NUM_EPISODES+1):
@@ -179,11 +181,20 @@ for i_episode in range(1, NUM_EPISODES+1):
     print(i_episode)
     
     for t in range(MAX_TURN):
-        
         for n in range(4):
-            
             # ターゲットプレイヤーのターン
             if n == x:
+                # 確認用
+                # 初期状態のパラメータをログに出力する
+                if (i_episode % TARGET_SAVE == 0) and (t == 0):
+                    for rep_money in range(9):
+                        rep_state = shape_state(dominion.get_state(target.get_allcard()), MAX_STATE, rep_money, DEVICE)
+                        rep_result = policy_net(rep_state)
+                        for rep_num in range(all_card_num+1):
+                            save_log(log3, format(float(rep_result[0, rep_num]), '.1f') + ', ')
+                        save_log(log3, '\n')
+                    save_log(log3, '\n')
+
                 # アクションフェイズ
                 target, players = dominion.execute_action(target, players)
         
@@ -196,9 +207,9 @@ for i_episode in range(1, NUM_EPISODES+1):
                 # 購入カードの選択
                 action = select_action(state, limit_money)
                 if action==None:
-                    save_log(log1, 'None, ')
+                    save_log(log1, 'なし, ')
                 else:
-                    save_log(log1, action.name + ', ')
+                    save_log(log1, action.japanese + ', ')
                 
                 # 購入フェイズ
                 target = dominion.execute_buy(target, action)

@@ -27,4 +27,4 @@ class gardens(victory_card):
         
 class curse(card.card):
     def __init__(self):
-        super(curse, self).__init__("curse", "curse", "呪い", 0, 0, -1, 30, "N")
+        super(curse, self).__init__("curse", "呪い", "curse", 0, 0, -1, 30, "N")

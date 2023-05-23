@@ -395,9 +395,11 @@ class archive(action_card):
     def effect(self, supply, t, players, trash, action_stack):
         action_count = action_stack
         tmps = []
-        while(len(t.hand) < 7):
-            card = deck_operation.check_top(t.deck, t.hand, t.discard)
-            if(card is None):
+        count = 0
+        while(len(t.hand) < 7 & count < 100):
+            count += 1
+            card = deck_operation.check_top(t.deck, t.discard)
+            if card == None:
                 break
             if(card.cardtype != "action"):
                 t.deck, t.hand, t.discard = deck_operation.draw(t.deck, t.hand, t.discard)
@@ -446,8 +448,8 @@ class vassal(action_card):
     
     def effect(self, supply, t, players, trash, action_stack):
         t.money_stack += 2
-        card = deck_operation.check_top(t.deck, t.hand, t.discard)
-        if(card is None):
+        card = deck_operation.check_top(t.deck, t.discard)
+        if card == None:
             return supply, t, players, trash, action_stack
         if(card.cardtype != "action"):
             t.discard.append(t.deck.pop(0))
@@ -520,6 +522,7 @@ class poacher(action_card):
                 break
             
         while count > 0:
+            if (len(t.hand)) == 0: break
             for i in range(len(t.hand)):
                 card = t.hand.pop(i)
                 t.discard.append(card)
@@ -575,7 +578,8 @@ class artisan(action_card):
             t.deck.insert(0,temp)
             return supply, t, players, trash, action_stack
         
-        temp = t.hand.pop(0)
-        t.deck.insert(0,temp)
+        if len(t.hand) > 0:
+            temp = t.hand.pop(0)
+            t.deck.insert(0, temp)
 
         return supply, t, players, trash, action_stack

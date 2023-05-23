@@ -12,12 +12,12 @@ def draw(deck, hand, discard):
     
     return deck, hand, discard
     
-def check_top(deck, hand, discard):
+def check_top(deck, discard):
     if(len(deck) == 0):
         deck, discard = refresh(deck, discard)
         
     if(len(deck) == 0):
-        return deck, hand, discard
+        return None
     
     card = deck[0]
     
@@ -30,7 +30,8 @@ def shuffle(deck):
 
 def refresh(deck, discard):
     deck.extend(discard)
-    discard = []
+    if len(deck) == 0:
+        return [], []
     random.shuffle(deck)
 
-    return deck, discard
+    return deck, []

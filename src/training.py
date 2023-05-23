@@ -1,14 +1,9 @@
 # DominionAI学習用クラス
 
 import os
-import math
 import random
 import datetime
 import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-if 'inline' in matplotlib.get_backend():
-    from IPython import display
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
@@ -85,9 +80,9 @@ def select_action(state, money):
             # money, supplyで絞り込み
             numlist = dominion.get_numlist_for_money(money)
             tmplist = []
-            tmplist.append(result[0, 0])  # Noneは毎回選択肢に入る
+            tmplist.append(float(result[0, 0]))  # Noneは毎回選択肢に入る
             for i in numlist:
-                tmplist.append(result[0, i+1])
+                tmplist.append(float(result[0, i+1]))
 
             # 絞り込み後のリストから最大値を探索
             if tmplist.index(max(tmplist)) == 0:
@@ -154,7 +149,7 @@ def optimize_model():
 
 # ログ出力        
 def save_log(fileName, word):
-    with open(fileName, 'a') as f:
+    with open(fileName, 'a', encoding='utf-8') as f:
         f.write(word)
 
 
@@ -198,9 +193,9 @@ for i_episode in range(1, NUM_EPISODES+1):
                 # 購入カードの選択
                 action = select_action(state, limit_money)
                 if action==None:
-                    save_log(log1, 'None, ')
+                    save_log(log1, 'なし, ')
                 else:
-                    save_log(log1, action.name + ', ')
+                    save_log(log1, action.japanese + ', ')
                 
                 # 購入フェイズ
                 target = dominion.execute_buy(target, action)
