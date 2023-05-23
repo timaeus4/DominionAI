@@ -303,8 +303,7 @@ class market(action_card):
         super(market, self).__init__("market", "市場", 5, 3, "N")
         
     def effect(self, supply, t, players, trash, action_stack):
-        for i in range(1):
-            t.deck, t.hand, t.discard = deck_operation.draw(t.deck, t.hand, t.discard)
+        t.deck, t.hand, t.discard = deck_operation.draw(t.deck, t.hand, t.discard)
         action_stack += 1
         t.money_stack += 1
         t.buy_stack += 1
@@ -465,7 +464,8 @@ class merchant(action_card):
         super(merchant, self).__init__("merchant", "商人", 3, 3, "B")
     
     def effect(self, supply, t, players, trash, action_stack):
-        
+        t.deck, t.hand, t.discard = deck_operation.draw(t.deck, t.hand, t.discard)
+        action_stack += 1
         return supply, t, players, trash, action_stack
     
     def buy_effect(self, supply, t, trash):
@@ -483,7 +483,23 @@ class herbinger(action_card):
         super(herbinger, self).__init__("herbinger", "前駆者", 3, 3, "N")
     
     def effect(self, supply, t, players, trash, action_stack):
-        
+        t.deck, t.hand, t.discard = deck_operation.draw(t.deck, t.hand, t.discard)
+        action_stack += 1
+
+        if len(t.discard) > 0:
+          max = 0
+          for i in range(len(t.discard)):
+            if t.discard[i].cardtype == "victory":
+              continue
+            else:
+              if max == 0:
+                max = i
+              elif t.discard[i].cost > t.discard[max].cost:
+                max = i
+          
+          if max != 0:
+            t.deck.insert(0, t.discard[max])
+
         return supply, t, players, trash, action_stack
     
 # 密猟者
