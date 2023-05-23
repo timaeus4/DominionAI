@@ -488,17 +488,17 @@ class herbinger(action_card):
 
         if len(t.discard) > 0:
           max = 0
+          index = -1
           for i in range(len(t.discard)):
-            if t.discard[i].cardtype == "victory":
-              continue
-            else:
-              if max == 0:
-                max = i
-              elif t.discard[i].cost > t.discard[max].cost:
-                max = i
+            if t.discard[i].cardtype != "victory":
+              if t.discard[i].cost > max:
+                max = t.discard[i].cost
+                index = i
           
-          if max != 0:
-            t.deck.insert(0, t.discard[max])
+          if index != -1:
+            t.deck.insert(0, t.discard.pop(index))
+
+        return supply, t, players, trash, action_stack
 
         return supply, t, players, trash, action_stack
     
