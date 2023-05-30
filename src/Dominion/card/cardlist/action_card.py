@@ -610,33 +610,26 @@ class bandit(action_card):
       tmp2 = deck_operation.check_top(p.deck, p.discard)
       if tmp2 is None: #デッキと捨て札が合計1枚  
         if tmp1 is None:
-          return supply, p, trash
         else:
           trash.append(tmp1)
-          return supply, p, trash
 
       elif tmp2.cardtype != "money" or tmp2.name == "bronze":
         if tmp1 is None:
           p.discard.append(p.deck.pop(0))
-          return supply, p, trash
         else:
           trash.append(tmp1)
           p.discard.append(p.deck.pop(0))
-          return supply, p, trash
 
       else:
         if tmp1 is None:
           trash.append(p.deck.pop(0))
-          return supply, p, trash
         else:
           if tmp1.cost > tmp2.cost:
             p.discard.append(tmp1)
             trash.append(p.deck.pop(0))
-            return supply, p, trash
           else:
             trash.append(tmp1)
             p.discard.append(p.deck.pop(0))
-            return supply, p, trash
       return supply, p, trash
 
 # 職人
