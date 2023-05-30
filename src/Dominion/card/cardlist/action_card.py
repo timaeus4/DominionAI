@@ -617,25 +617,25 @@ class bandit(action_card):
 
       elif tmp2.cardtype != "money" or tmp2.name == "bronze":
         if tmp1 is None:
-          p.discard.append(tmp2)
+          p.discard.append(p.deck.pop(0))
           return supply, p, trash
         else:
           trash.append(tmp1)
-          p.discard.append(tmp2)
+          p.discard.append(p.deck.pop(0))
           return supply, p, trash
 
       else:
         if tmp1 is None:
-          trash.append(tmp2)
+          trash.append(p.deck.pop(0))
           return supply, p, trash
         else:
           if tmp1.cost > tmp2.cost:
             p.discard.append(tmp1)
-            trash.append(tmp2)
+            trash.append(p.deck.pop(0))
             return supply, p, trash
           else:
             trash.append(tmp1)
-            p.discard.append(tmp2)
+            p.discard.append(p.deck.pop(0))
             return supply, p, trash
       return supply, p, trash
 
