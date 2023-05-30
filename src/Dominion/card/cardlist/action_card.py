@@ -553,8 +553,36 @@ class stentry(action_card):
         super(stentry, self).__init__("stentry", "衛兵", 5, 3, "N")
     
     def effect(self, supply, t, players, trash, action_stack):
-        
+        t.deck, t.hand, t.discard = deck_operation.draw(t.deck, t.hand, t.discard)
+        action_stack += 1
+
+        tmp1 = deck_operation.check_top
+        if tmp1 == None: #デッキと捨て札が合計0枚
+          return supply, t, players, trash, action_stack
+        tmp1 = t.deck.pop[0]
+
+        tmp2 = deck_operation.check_top
+        if tmp2 == None: #デッキと捨て札が合計1枚  
+          t, trash = self.stentry_select(tmp1, t, trash)
+          return supply, t, players, trash, action_stack
+        tmp2 = t.deck.pop[0]
+        t, trash = self.stentry_select(tmp1, t, trash)
+        t, trash = self.stentry_select(tmp2, t, trash)    
+
         return supply, t, players, trash, action_stack
+    
+    def stentry_select(self, card, t, trash):
+      if card.name == "cursed":
+        trash.append(card)
+      elif card.name == "house":
+        trash.append(card)
+      elif card.name == "bronze":
+        trash.append(card)
+      elif card.cardtype == "victory":
+        t.discard.append(card)
+      else:
+        t.deck.insert(0, card)        
+        return t, trash
 
 # 山賊
 class bandit(action_card):
