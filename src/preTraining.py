@@ -23,21 +23,21 @@ MAX_PRICE = 8  # プール内最大価格
 VERSION = "standard"  # サプライのバージョン
 COMMON_CARD_NUM = 7  # 共通サプライ種類数
 MAX_STATE = 20  # 同一カード保持上限枚数
-ADJUST = 96  # SUPPLY_NUM, MAX_STATEに依存
+ADJUST = 288  # SUPPLY_NUM, MAX_STATEに依存
 MAX_TURN = 30  # ターン上限
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 TRANSITION = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
 
 
 # ハイパーパラメータ
-NUM_EPISODES = 5000  # 学習回数
-BATCH_SIZE = 80  # バッチサイズ
+NUM_EPISODES = 10000  # 学習回数
+BATCH_SIZE = 1000  # バッチサイズ
 GAMMA = 0.99  # 割引率
-EPS_START = 0.8  # e-greedy法
-EPS_END = 0.1  # e-greedy法
+EPS_START = 0.75  # e-greedy法
+EPS_END = 0.05  # e-greedy法
 EPS_DECAY = 10000  # e-greedy法
-TARGET_UPDATE = 10  # 学習結果反映タイミング 
-TARGET_SAVE = 100  # 学習結果記録タイミング
+TARGET_UPDATE = 50  # 学習結果反映タイミング 
+TARGET_SAVE = 500  # 学習結果記録タイミング
 
 
 # ログ用設定
@@ -48,7 +48,7 @@ dirname = ymd+"/"+hm+"pre"
 log1 = dirname+'/buy.log'
 log2 = dirname+'/train.log'
 log3 = dirname+'/param.csv'
-os.makedirs(dirname)
+os.makedirs(dirname, exist_ok=True)
 
 
 # Dominion準備
@@ -76,7 +76,6 @@ def select_action(state, money):
         save_log(log1, '<AI'+str(money)+'>')
         with torch.no_grad():
             result = policy_net(state)
-
 
             # money, supplyで絞り込み
             numlist = dominion.get_numlist_for_just_money(money)
@@ -132,7 +131,8 @@ def optimize_model():
     result = target_net(non_final_next_states)
     numlist = dominion.get_numlist_for_just_money(money)
     tmplist = []
-    tmplist.append(result[0, 0])
+    if money <= 2:
+        tmplist.append(result[0, 0])  # 2金以下の場合Noneを選択肢に入れる
     for i in numlist:
         tmplist.append(result[0, i+1])
     next_state_values[non_final_mask] = max(tmplist).detach()
@@ -162,6 +162,8 @@ save_log(log3, '\n')
 total_reward = 0
 for i_episode in range(1, NUM_EPISODES+1):
 
+    # 報酬をリセット
+    reward = 0
     dominion.setup(dominion.generate_random_supply(VERSION, version_card_num))
     players = []
     
@@ -210,7 +212,9 @@ for i_episode in range(1, NUM_EPISODES+1):
                     save_log(log1, 'なし, ')
                 else:
                     save_log(log1, action.japanese + ', ')
-                
+                    if action.name=="province":
+                        reward += 1
+
                 # 購入フェイズ
                 target = dominion.execute_buy(target, action)
                 
@@ -225,12 +229,16 @@ for i_episode in range(1, NUM_EPISODES+1):
                     done = True
                     next_state = None
                     if dominion.is_win(target, players):
-                        reward = 1
-                    else:
-                        reward = -1
+                        reward += 3
+                    break
                 else: 
                     done = False
-                    reward = 0
+
+                # ターンごとに結果をメモリに記録
+                action = dominion.allcard2int(action)
+                action = myF.int2tensor([action], DEVICE)
+                reward = myF.int2tensor(reward, DEVICE)
+                memory.push_memory(state, action, next_state, reward)
                     
             else:
                 other = players[n]
@@ -247,25 +255,16 @@ for i_episode in range(1, NUM_EPISODES+1):
                     done = True
                     next_state = None
                     if dominion.is_win(target, players):
-                        reward = 1
-                    else:
-                        reward = -1
+                        reward += 3
+                    break
                 else: 
                     done = False
-                    reward = 0
-
-        # ターンごとに結果をメモリに記録
-        action = dominion.allcard2int(action)
-        action = myF.int2tensor([action], DEVICE)
-        reward = myF.int2tensor(reward, DEVICE)
-        memory.push_memory(state, action, next_state, reward)
-        
-        optimize_model()
         
         # ゲーム終了時
         if done:
-            
-            total_reward += reward[0].item()
+            optimize_model()
+            if dominion.is_win(target, players):
+                total_reward += 1
             save_log(log1, str(reward[0].item()) + '\n')
             break
         
@@ -278,8 +277,7 @@ for i_episode in range(1, NUM_EPISODES+1):
         model_name = epidir+'/param.dat'
         torch.save(policy_net.state_dict(), model_name)
             
-        win = (TARGET_SAVE + total_reward) / 2
-        winrate = win/TARGET_SAVE
+        winrate = total_reward/TARGET_SAVE
         save_log(log2, str(winrate) + '\n')
         total_reward = 0
 

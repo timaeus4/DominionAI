@@ -558,30 +558,30 @@ class stentry(action_card):
 
         tmp1 = deck_operation.check_top(t.deck, t.discard)
         if tmp1 is None: #デッキと捨て札が合計0枚
-          return supply, t, players, trash, action_stack
-        tmp1 = t.deck.pop[0]
+            return supply, t, players, trash, action_stack
+        tmp1 = t.deck.pop(0)
 
         tmp2 = deck_operation.check_top(t.deck, t.discard)
         if tmp2 is None: #デッキと捨て札が合計1枚  
-          t, trash = self.stentry_select(tmp1, t, trash)
-          return supply, t, players, trash, action_stack
-        tmp2 = t.deck.pop[0]
+            t, trash = self.stentry_select(tmp1, t, trash)
+            return supply, t, players, trash, action_stack
+        tmp2 = t.deck.pop(0)
         t, trash = self.stentry_select(tmp1, t, trash)
         t, trash = self.stentry_select(tmp2, t, trash)    
 
         return supply, t, players, trash, action_stack
     
     def stentry_select(self, card, t, trash):
-      if card.name == "cursed":
-        trash.append(card)
-      elif card.name == "house":
-        trash.append(card)
-      elif card.name == "bronze":
-        trash.append(card)
-      elif card.cardtype == "victory":
-        t.discard.append(card)
-      else:
-        t.deck.insert(0, card)        
+        if card.name == "cursed":
+            trash.append(card)
+        elif card.name == "house":
+            trash.append(card)
+        elif card.name == "bronze":
+            trash.append(card)
+        elif card.cardtype == "victory":
+            t.discard.append(card)
+        else:
+            t.deck.insert(0, card)        
         return t, trash
 
 # 山賊
@@ -591,46 +591,47 @@ class bandit(action_card):
     
     def effect(self, supply, t, players, trash, action_stack):
         for card in supply:
-          if(card.name == "gold"):
-            if(card.num > 0):
-              card.reduce(1)
-              t.discard.append(card)
+            if(card.name == "gold"):
+                if(card.num > 0):
+                    card.reduce(1)
+                    t.discard.append(card)
         return supply, t, players, trash, action_stack
     
     def attack_effect(self, supply, p, trash):
-      tmp1 = deck_operation.check_top(p.deck, p.discard)
-      if tmp1 is None: #デッキと捨て札が合計0枚
-        return supply, p, trash
-      elif tmp1.cardtype != "money" or tmp1.name == "bronze":
-        tmp1 = None
-        p.discard.append(p.deck.pop(0))
-      else:
-        tmp1 = p.deck.pop[0]
-
-      tmp2 = deck_operation.check_top(p.deck, p.discard)
-      if tmp2 is None: #デッキと捨て札が合計1枚  
-        if tmp1 is None:
-        else:
-          trash.append(tmp1)
-
-      elif tmp2.cardtype != "money" or tmp2.name == "bronze":
-        if tmp1 is None:
-          p.discard.append(p.deck.pop(0))
-        else:
-          trash.append(tmp1)
-          p.discard.append(p.deck.pop(0))
-
-      else:
-        if tmp1 is None:
-          trash.append(p.deck.pop(0))
-        else:
-          if tmp1.cost > tmp2.cost:
-            p.discard.append(tmp1)
-            trash.append(p.deck.pop(0))
-          else:
-            trash.append(tmp1)
+        tmp1 = deck_operation.check_top(p.deck, p.discard)
+        if tmp1 is None: #デッキと捨て札が合計0枚
+            return supply, p, trash
+        elif tmp1.cardtype != "money" or tmp1.name == "bronze":
+            tmp1 = None
             p.discard.append(p.deck.pop(0))
-      return supply, p, trash
+        else:
+            tmp1 = p.deck.pop(0)
+
+        tmp2 = deck_operation.check_top(p.deck, p.discard)
+        if tmp2 is None: #デッキと捨て札が合計1枚  
+            if tmp1 is None:
+                pass
+            else:
+                trash.append(tmp1)
+
+        elif tmp2.cardtype != "money" or tmp2.name == "bronze":
+            if tmp1 is None:
+                p.discard.append(p.deck.pop(0))
+            else:
+                trash.append(tmp1)
+                p.discard.append(p.deck.pop(0))
+
+        else:
+            if tmp1 is None:
+                trash.append(p.deck.pop(0))
+            else:
+                if tmp1.cost > tmp2.cost:
+                    p.discard.append(tmp1)
+                    trash.append(p.deck.pop(0))
+                else:
+                    trash.append(tmp1)
+                    p.discard.append(p.deck.pop(0))
+        return supply, p, trash
 
 # 職人
 class artisan(action_card):
