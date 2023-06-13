@@ -1,32 +1,34 @@
 import unittest
+from Dominion import player
 from cardlist import action_card
 from cardlist import victory_card
 from cardlist import money_card
 from cardlist import card
 
-plain_card = card.card("", "", 0, 0, 0, 0)
+plain_card = card.card("", "", "", 0, 0, 0, 0, "")
 
 class test_village(unittest.TestCase):
     def test_effect(self):
         test_class=action_card.village()
         
         supply = []
-        deck = [plain_card]
-        hand = []
-        play_area = []
-        discard = []
+        t = player.Player()
+        t.deck = [plain_card]
+        t.hand = []
+        t.play_area = []
+        t.discard = []
+        t.money_stack = 0
+        t.buy_stack = 0
         trash = []
         action_stack = 0
-        money_stack = 0
-        buy_stack = 0
         
         expected_deck = []
         expected_hand = [plain_card]
         expected_actionstack = 2
         
-        _,act_deck,act_hand,_,_,_,act_actionstack,_,_ = test_class.effect(supply,deck,hand,play_area,discard,trash,action_stack,money_stack,buy_stack)
-        self.assertEqual(expected_deck,act_deck)
-        self.assertEqual(expected_hand,act_hand)
+        _,act_t,_,_,act_actionstack = test_class.effect(supply,t,None,trash,action_stack)
+        self.assertEqual(expected_deck,act_t.deck)
+        self.assertEqual(expected_hand,act_t.hand)
         self.assertEqual(expected_actionstack,act_actionstack)
 
 class test_blacksmith(unittest.TestCase):
