@@ -23,19 +23,19 @@ MAX_PRICE = 8  # プール内最大価格
 VERSION = "standard"  # サプライのバージョン
 COMMON_CARD_NUM = 7  # 共通サプライ種類数
 MAX_STATE = 20  # 同一カード保持上限枚数
-ADJUST = 96  # SUPPLY_NUM, MAX_STATEに依存
+ADJUST = 144  # SUPPLY_NUM, MAX_STATEに依存
 MAX_TURN = 30  # ターン上限
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 TRANSITION = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
 
 
 # ハイパーパラメータ
-NUM_EPISODES = 2000  # 学習回数
-BATCH_SIZE = 150  # バッチサイズ
+NUM_EPISODES = 1000  # 学習回数
+BATCH_SIZE = 1000  # バッチサイズ
 GAMMA = 0.99  # 割引率
-EPS_START = 0.25  # e-greedy法
+EPS_START = 0.75  # e-greedy法
 EPS_END = 0.05  # e-greedy法
-EPS_DECAY = 2000  # e-greedy法
+EPS_DECAY = 5000  # e-greedy法
 TARGET_UPDATE = 10  # 学習結果反映タイミング 
 TARGET_SAVE = 100  # 学習結果記録タイミング
 
@@ -46,6 +46,7 @@ hm = format(now,"%H%M")
 dirname = ymd+"/"+hm
 log1 = dirname+'/buy.log'
 log2 = dirname+'/train.log'
+log3 = dirname+'/param.csv'
 os.makedirs(dirname)
 
 
@@ -128,13 +129,7 @@ def optimize_model():
 
     next_state_values = torch.zeros(BATCH_SIZE, device=DEVICE)
 
-    result = target_net(non_final_next_states)
-    numlist = dominion.get_numlist_for_money(money)
-    tmplist = []
-    tmplist.append(result[0, 0])
-    for i in numlist:
-        tmplist.append(result[0, i+1])
-    next_state_values[non_final_mask] = max(tmplist).detach()
+    next_state_values[non_final_mask] = target_net(non_final_next_states).max(1)[0].detach()
 
     expected_state_action_values = (next_state_values * GAMMA) + reward_batch
     
@@ -181,6 +176,17 @@ for i_episode in range(1, NUM_EPISODES+1):
             
             # ターゲットプレイヤーのターン
             if n == x:
+                # 確認用
+                # 初期状態のパラメータをログに出力する
+                if (i_episode % TARGET_SAVE == 0) and (t == 0):
+                    for rep_money in range(9):
+                        rep_state = shape_state(dominion.get_state(target.get_allcard()), MAX_STATE, rep_money, DEVICE)
+                        rep_result = policy_net(rep_state)
+                        for rep_num in range(all_card_num+1):
+                            save_log(log3, format(float(rep_result[0, rep_num]), '.1f') + ', ')
+                        save_log(log3, '\n')
+                    save_log(log3, '\n')
+
                 # アクションフェイズ
                 target, players = dominion.execute_action(target, players)
         

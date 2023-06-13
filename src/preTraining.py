@@ -16,6 +16,8 @@ from DQN import DQN
 from DQN import DQN_Memory as DQN_M
 from Utils import myFunction as myF
 
+pre_flag = True
+
 
 # 固定パラメータ
 MEMORY_SIZE = 50000  # 記録用メモリサイズ
@@ -23,21 +25,21 @@ MAX_PRICE = 8  # プール内最大価格
 VERSION = "standard"  # サプライのバージョン
 COMMON_CARD_NUM = 7  # 共通サプライ種類数
 MAX_STATE = 20  # 同一カード保持上限枚数
-ADJUST = 288  # SUPPLY_NUM, MAX_STATEに依存
+ADJUST = 144  # SUPPLY_NUM, MAX_STATEに依存
 MAX_TURN = 30  # ターン上限
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 TRANSITION = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
 
 
 # ハイパーパラメータ
-NUM_EPISODES = 10000  # 学習回数
+NUM_EPISODES = 2000  # 学習回数
 BATCH_SIZE = 1000  # バッチサイズ
 GAMMA = 0.99  # 割引率
-EPS_START = 0.75  # e-greedy法
+EPS_START = 0.95  # e-greedy法
 EPS_END = 0.05  # e-greedy法
-EPS_DECAY = 10000  # e-greedy法
-TARGET_UPDATE = 50  # 学習結果反映タイミング 
-TARGET_SAVE = 500  # 学習結果記録タイミング
+EPS_DECAY = 1000  # e-greedy法
+TARGET_UPDATE = 20  # 学習結果反映タイミング
+TARGET_SAVE = 100  # 学習結果記録タイミング
 
 
 # ログ用設定
@@ -77,19 +79,43 @@ def select_action(state, money):
         with torch.no_grad():
             result = policy_net(state)
 
-            # money, supplyで絞り込み
-            numlist = dominion.get_numlist_for_just_money(money)
-            tmplist = []
-            if money <= 2:
-                tmplist.append(float(result[0, 0]))  # 2金以下の場合Noneを選択肢に入れる
-            for i in numlist:
-                tmplist.append(float(result[0, i+1]))
+            if pre_flag == True:
+                if money == 6 or money == 7 or money == 8:
+                    numlist = dominion.get_numlist_for_just_money(money)
+                    tmplist = []
+                    for i in numlist:
+                        tmplist.append(float(result[0, i+1]))
+                    return dominion.int2allcard(numlist[tmplist.index(max(tmplist))-1])
 
-            # 絞り込み後のリストから最大値を探索
-            if money <= 2 & tmplist.index(max(tmplist)) == 0:
-                return None
+                # money, supplyで絞り込み
+                numlist = dominion.get_numlist_for_money(money)
+                tmplist = []
+                if money <= 2:
+                    tmplist.append(float(result[0, 0]))  # 2金以下の場合Noneを選択肢に入れる
+                for i in numlist:
+                    tmplist.append(float(result[0, i+1]))
+
+                # 絞り込み後のリストから最大値を探索
+                if money <= 2 & tmplist.index(max(tmplist)) == 0:
+                    return None
+                
+                else:
+                    return dominion.int2allcard(numlist[tmplist.index(max(tmplist))-1])
+            
             else:
-                return dominion.int2allcard(numlist[tmplist.index(max(tmplist))-1])
+                # money, supplyで絞り込み
+                numlist = dominion.get_numlist_for_money(money)
+                tmplist = []
+                tmplist.append(float(result[0, 0]))  # Noneは毎回選択肢に入る
+                for i in numlist:
+                    tmplist.append(float(result[0, i+1]))
+
+                # 絞り込み後のリストから最大値を探索
+                if tmplist.index(max(tmplist)) == 0:
+                    return None
+                else:
+                    return dominion.int2allcard(numlist[tmplist.index(max(tmplist))-1])
+    
     # e-greedy法を満たさなかった場合、コインプレイに従う
     else:
         return strategy.coin_method(money)
@@ -99,13 +125,13 @@ def select_action(state, money):
 def shape_state(state, size, money, device):
     a = myF.expand_line2plane(state, size)
     b = np.zeros((len(a), size))
-    for i in range(dominion.count_supply(money)-1):
+    for i in dominion.get_numlist_for_money(money):
         for j in range(size):
             b[i][j] = 1
-    c = np.zeros(((2, len(a), size)))
-    c[0,:,:] = a
-    c[1,:,:] = b
-    return myF.convert_to_tensor(c, device)
+    d = np.zeros(((2, len(a), size)))
+    d[0,:,:] = a
+    d[1,:,:] = b
+    return myF.convert_to_tensor(d, device)
         
 
 # ネットワーク最適化処理
@@ -128,14 +154,14 @@ def optimize_model():
 
     next_state_values = torch.zeros(BATCH_SIZE, device=DEVICE)
 
-    result = target_net(non_final_next_states)
-    numlist = dominion.get_numlist_for_just_money(money)
-    tmplist = []
-    if money <= 2:
-        tmplist.append(result[0, 0])  # 2金以下の場合Noneを選択肢に入れる
-    for i in numlist:
-        tmplist.append(result[0, i+1])
-    next_state_values[non_final_mask] = max(tmplist).detach()
+    next_state_values[non_final_mask] = target_net(non_final_next_states).max(1)[0].detach()
+    #numlist = dominion.get_numlist_for_just_money(money)
+    #tmplist = []
+    #if money <= 2:
+    #    tmplist.append(result[0, 0])  # 2金以下の場合Noneを選択肢に入れる
+    #for i in numlist:
+    #    tmplist.append(result[0, i+1])
+    #next_state_values[non_final_mask] = max(tmplist).detach()
 
     expected_state_action_values = (next_state_values * GAMMA) + reward_batch
     
@@ -213,7 +239,9 @@ for i_episode in range(1, NUM_EPISODES+1):
                 else:
                     save_log(log1, action.japanese + ', ')
                     if action.name=="province":
-                        reward += 1
+                        reward += 5
+                    elif action.name=="curse":
+                        reward -= 100
 
                 # 購入フェイズ
                 target = dominion.execute_buy(target, action)
@@ -228,8 +256,8 @@ for i_episode in range(1, NUM_EPISODES+1):
                 if dominion.check_gameset():
                     done = True
                     next_state = None
-                    if dominion.is_win(target, players):
-                        reward += 3
+                    if not dominion.is_win(target, players):
+                        reward -= t * 2
                     break
                 else: 
                     done = False
@@ -239,6 +267,8 @@ for i_episode in range(1, NUM_EPISODES+1):
                 action = myF.int2tensor([action], DEVICE)
                 reward = myF.int2tensor(reward, DEVICE)
                 memory.push_memory(state, action, next_state, reward)
+
+                reward += 1
                     
             else:
                 other = players[n]
@@ -255,13 +285,13 @@ for i_episode in range(1, NUM_EPISODES+1):
                     done = True
                     next_state = None
                     if dominion.is_win(target, players):
-                        reward += 3
+                        reward -= t * 2
                     break
                 else: 
                     done = False
         
         # ゲーム終了時
-        if done:
+        if done or t==MAX_TURN-1:
             optimize_model()
             if dominion.is_win(target, players):
                 total_reward += 1

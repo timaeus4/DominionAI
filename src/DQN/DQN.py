@@ -7,12 +7,12 @@ class DQN(nn.Module):
     def __init__(self, w, h, n, outputs):
         super(DQN, self).__init__()
 
-        self.conv1 = nn.Conv2d(2, 8, kernel_size=5, stride=1)
-        self.bn1 = nn.BatchNorm2d(8)
-        self.conv2 = nn.Conv2d(8, 16, kernel_size=5, stride=1)
-        self.bn2 = nn.BatchNorm2d(16)
-        self.conv3 = nn.Conv2d(16, 32, kernel_size=5, stride=1)
-        self.bn3 = nn.BatchNorm2d(32)
+        self.conv1 = nn.Conv2d(2, 4, kernel_size=5, stride=1)
+        self.bn1 = nn.BatchNorm2d(4)
+        self.conv2 = nn.Conv2d(4, 8, kernel_size=5, stride=1)
+        self.bn2 = nn.BatchNorm2d(8)
+        self.conv3 = nn.Conv2d(8, 16, kernel_size=5, stride=1)
+        self.bn3 = nn.BatchNorm2d(16)
         #self.conv4 = nn.Conv2d(32, 32, kernel_size=4, stride=1)
         #self.bn4 = nn.BatchNorm2d(32)
         

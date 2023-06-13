@@ -154,7 +154,7 @@ class moat(action_card):
     
     def react_effect(self, supply, t, trash):
         t.barrier_flg = True
-        return self, supply, t, trash
+        return supply, t, trash
 
 # 工房
 class workshop(action_card):

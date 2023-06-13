@@ -62,7 +62,7 @@ def attack_effect(attack_card, supply, target, players, trash):
 def react_effect(supply, player, trash):
     for card in player.hand:
         if card.alter_flg == "R":
-            supply, target, players, trash = card.react_effect(supply, target, players, trash)
+            supply, player, trash = card.react_effect(supply, player, trash)
     return supply, player, trash
 
 # 購入時効果
